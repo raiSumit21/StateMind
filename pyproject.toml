@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "statemind"
+version = "0.1.0"
+description = "Stateful AI conversations on stateless infrastructure."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "pydantic>=2.5.0", # Our core data validation library
+]
+
+# This creates a "dev" environment profile with our testing and linting tools
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.3.0",
+    "mypy>=1.8.0",
+]
+
+# --- Tool Configurations ---
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"] # Enforce standard errors, formatting, and import sorting
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
