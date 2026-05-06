@@ -1,13 +1,15 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
+
 from statemind.schema.models import Message
+
 
 class BaseMemoryAdapter(ABC):
     """
     The abtract base class for all Statemind mempory adapters.
     """
 
-    def _validate_identifiers(self,user_id:Optional[str], sessio_id:Optional[str])->None:
+    def _validate_identifiers(self,user_id:Optional[str], session_id:Optional[str])->None:
         if not user_id and not session_id:
             raise ValueError("You must provide either a user_id or a session_id (or both) to manage state")
 

@@ -1,10 +1,10 @@
-from typing import List, Optional
 from datetime import datetime, timezone
+from typing import List, Optional
+
 from pymongo import AsyncMongoClient
 
 from statemind.memory.base import BaseMemoryAdapter
 from statemind.schema.models import Message
-
 
 
 class MongoAdapter(BaseMemoryAdapter):
