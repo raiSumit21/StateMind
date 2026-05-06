@@ -10,6 +10,8 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "pydantic>=2.5.0", # Our core data validation library
+    "pymongo>=4.9.0",
+    "tiktoken>=0.6.0"
 ]
 
 # This creates a "dev" environment profile with our testing and linting tools
