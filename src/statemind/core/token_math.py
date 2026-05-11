@@ -1,6 +1,6 @@
 from typing import List
 
-import tiktoken # type: ignore
+import tiktoken  # type: ignore
 
 from statemind.schema.models import Message
 
