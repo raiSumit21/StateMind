@@ -1,6 +1,6 @@
 from typing import List
 
-import tiktoken
+import tiktoken # type: ignore
 
 from statemind.schema.models import Message
 
@@ -17,7 +17,7 @@ def count_tokens(text:str,model:str='gpt-4o')->int:
 
 
 def count_message_token(messages:List[Message], model:str='gpt-4o')->int:
-    """Calculates the total token count for a list of Statemind Message Objects"""
+    """Calculates the total token count for a list of Statemind Message Objects""" 
 
     total_tokens = 0
     for msg in messages:
