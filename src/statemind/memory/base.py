@@ -6,7 +6,7 @@ from statemind.schema.models import Message
 
 class BaseMemoryAdapter(ABC):
     """
-    The abtract base class for all Statemind mempory adapters.
+    The abstract base class for all Statemind mempory adapters.
     """
 
     def _validate_identifiers(self,user_id:Optional[str], session_id:Optional[str])->None:
