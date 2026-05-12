@@ -23,7 +23,7 @@ def count_message_token(messages:List[Message], model:str='gpt-4o')->int:
     for msg in messages:
         total_tokens +=4
         total_tokens += count_tokens(msg.role,model)
-        total_tokens += count_message_token(msg.content,model)
+        total_tokens += count_tokens(msg.content,model)
 
     total_tokens +=3    
     return total_tokens

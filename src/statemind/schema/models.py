@@ -27,7 +27,7 @@ class ConversationContext(BaseModel):
     messages: List[Message]
     system_prompt: Optional[str] = Field(
         default = None,
-        descriptions = "The system instruction prepended to the conversation."
+        description = "The system instruction prepended to the conversation."
     )
     total_tokens: Optional[int] = Field(
         default = None,
