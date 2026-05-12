@@ -1,147 +1,30 @@
 # 🧠 Statemind
 
-**Stateful AI conversations on stateless infrastructure.**
+**Statemind** is a lightweight, zero-dependency Python package designed to manage **multi-tenant conversational memory** for LLM applications.
 
-Statemind is a lightweight Python package that provides **memory, context management, and multi-tenant conversation state** for LLM applications running on **stateless servers**.
-
-Build scalable ChatGPT-like systems **without sockets, sessions, or long-running workers**.
+Whether you are building a serverless FastAPI backend, a Streamlit app, or running a local LLM via Ollama, **Statemind acts as the invisible brain** that manages chat history and guarantees your context never exceeds the model’s token limit.
 
 ---
 
-## 🚀 Why Statemind?
+## ✨ Features
 
-LLMs are stateless:
-tokens in → tokens out
+- ✅ **Token-Aware Sliding Window**  
+  Automatically trims old messages when history exceeds your `max_tokens` budget.
 
-But users expect **stateful conversations**.
+- ✅ **Multi-Tenant Ready**  
+  Supports tenants → users → conversations out of the box.
 
-Most chatbot systems solve this using:
-- WebSockets
-- Sticky sessions
-- Long-running threads
-- In-memory state
+- ✅ **Stateless Server Compatible**  
+  Designed for serverless and horizontally scalable architectures.
 
-These approaches **do not scale**.
+- ✅ **Pluggable Storage Architecture**  
+  Works with in-memory storage, MongoDB, or custom adapters.
 
-Statemind solves this by externalizing memory and reconstructing conversational state **on every request**.
+- ✅ **Strict Data Contracts**  
+  Uses Pydantic models to guarantee consistent message formatting.
 
-✅ Stateless servers  
-✅ Horizontal scaling  
-✅ Multi-tenancy support  
-✅ Serverless compatible  
-✅ Production-ready memory architecture  
-
----
-
-## ✨ Core Idea
-
-Statemind turns this:
-Stateful chatbot server ❌
-
-into:
-Stateless API + External Memory + Context Builder ✅
-
-Every request becomes:
-
-1. Load memory
-2. Build context
-3. Call LLM
-4. Save response
-5. Return reply
-
-No sessions required.
-
----
-
-## 🏗 Architecture
-
-Client
-↓
-Stateless API
-↓
-Statemind Memory Engine
-↓
-Context Builder
-↓
-LLM Provider
-
-
-Statemind acts as the **Conversation State Manager** for LLM systems.
-
----
-
-## 🔥 Features
-
-### 🧠 Conversational Memory
-- Short-term conversation history
-- Long-term user memory
-- Automatic history reconstruction
-
----
-
-### 🏢 Multi-Tenant Ready
-Built for SaaS platforms.
-
-Hierarchy:
-Tenant → User → Conversation → Messages
-
-Guaranteed isolation between tenants.
-
----
-
-### ⚡ Stateless by Design
-Works with:
-
-- FastAPI
-- Flask
-- Serverless (AWS Lambda / Cloud Run)
-- Kubernetes microservices
-
-No sockets. No sticky sessions.
-
----
-
-### 🧩 Pluggable Memory Backends
-
-- Redis
-- PostgreSQL
-- SQLite
-- Vector databases
-- Custom adapters
-
----
-
-### 🪄 Context Builder (Core Feature)
-
-Automatically:
-
-- retrieves relevant history
-- compresses old messages
-- enforces token budgets
-- injects system memory
-- prepares model-ready prompts
-
----
-
-### 🔒 Concurrency Safe
-Designed for high-scale environments:
-
-- async safe writes
-- append-only conversations
-- race-condition protection
-
----
-
-### 🤖 Model Agnostic
-
-Works with:
-
-- OpenAI APIs
-- local models
-- vLLM
-- Ollama
-- HuggingFace endpoints
-- custom inference servers
+- ✅ **Model Agnostic**  
+  Works with OpenAI, Anthropic, HuggingFace, Ollama, or any local LLM.
 
 ---
 
@@ -149,35 +32,193 @@ Works with:
 
 ```bash
 pip install statemind
-
 ```
 
-🎯 Design Principles
-Stateless first
-Infrastructure over framework
-Model independence
-Horizontal scalability
-Minimal developer friction
+For MongoDB support:
 
-Statemind is not a chatbot framework.
+```bash
+pip install statemind pymongo
+```
 
-It is LLM state infrastructure.
+---
 
+## 🚀 Quick Start
 
+Statemind separates **memory management** from **LLM inference**.
 
+### 1️⃣ Setup the Engine
 
+```python
+from statemind import Statemind, InMemoryAdapter
 
+db = InMemoryAdapter()
+engine = Statemind(memory=db)
+```
 
+---
 
+### 2️⃣ Chat Lifecycle
 
+```python
+import asyncio
+from statemind import Message, Role
 
+async def main():
+    tenant_id = "my_startup"
+    user_id = "user_123"
 
+    # Save user message
+    user_msg = Message(role=Role.USER, content="Hello! I need help with Python.")
+    await engine.add_message(
+        tenant_id=tenant_id,
+        user_id=user_id,
+        message=user_msg
+    )
 
+    # Build optimized context window
+    context = await engine.get_context(
+        tenant_id=tenant_id,
+        user_id=user_id,
+        system_prompt="You are a senior Python developer.",
+        max_tokens=2000
+    )
 
+    # Call your LLM here
+    ai_text = "Of course! What Python concepts are you struggling with?"
 
+    # Save assistant response
+    ai_msg = Message(role=Role.ASSISTANT, content=ai_text)
+    await engine.add_message(
+        tenant_id=tenant_id,
+        user_id=user_id,
+        message=ai_msg
+    )
 
+asyncio.run(main())
+```
 
+---
 
+## 🧩 Architecture Philosophy
 
+Statemind treats chat systems as:
 
+```
+Tenant → User → Session → Messages
+```
 
+Instead of keeping state in sockets or threads, Statemind:
+
+- stores memory externally
+- rebuilds context on demand
+- enables massive horizontal scaling
+
+This makes it ideal for:
+
+- Serverless APIs
+- Stateless microservices
+- Multi-tenant SaaS chat platforms
+- Local LLM applications
+
+---
+
+## 🔌 Included Adapters
+
+### InMemoryAdapter
+
+Best for:
+
+- local development
+- testing
+- Streamlit apps
+
+Data resets when the server restarts.
+
+---
+
+### MongoAdapter
+
+Production-ready persistent storage.
+
+```python
+from statemind import MongoAdapter
+
+db = MongoAdapter(
+    uri="mongodb://localhost:27017",
+    db_name="statemind_prod",
+    collection_name="messages"
+)
+```
+
+Supports thousands of concurrent users without blocking async workloads.
+
+---
+
+## 🧠 Works With Local LLMs
+
+Statemind integrates seamlessly with:
+
+- Ollama
+- llama.cpp
+- HuggingFace Transformers
+- vLLM
+- OpenAI-compatible APIs
+
+You control inference.  
+Statemind controls memory.
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome!
+
+Before submitting:
+
+```bash
+ruff check .
+pytest tests/
+```
+
+Please open an issue first for major feature discussions.
+
+---
+
+## 🌱 Development Workflow
+
+Create documentation branch:
+
+```bash
+git checkout dev
+git pull origin dev
+git checkout -b docs/readme-update
+```
+
+Push updates:
+
+```bash
+git add README.md
+git commit -m "docs: write comprehensive README and Quick Start guide"
+git push -u origin docs/readme-update
+```
+
+Then open a Pull Request against `dev`.
+
+---
+
+## 📜 License
+
+MIT License
+
+---
+
+## ⭐ Vision
+
+Statemind aims to become the **standard memory layer for LLM applications**, enabling developers to build scalable conversational systems without managing state manually.
+
+```
+Stateless servers.
+Stateful conversations.
+```
+
+---
